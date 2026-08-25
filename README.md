@@ -16,3 +16,7 @@
 ## GitHub Pages
 
 仓库使用 `.github/workflows/pages.yml` 自动部署。将仓库 Pages 设置为 `GitHub Actions` 后，每次推送到 `main` 会自动发布。
+
+自定义域名：`https://hyggec.eu.cc/`
+
+DNS 配置：添加 CNAME 记录 `hyggec.eu.cc` → `hyggec.github.io`。
