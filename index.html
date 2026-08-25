@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carlink 语音端到端测试台</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <p class="eyebrow">CARLINK / VOICE QA</p>
+          <h1>语音测试台</h1>
+        </div>
+      </div>
+      <div class="header-meta">
+        <!-- <div class="meta-chip"><span class="status-dot"></span><span>测试环境</span><strong>低噪声</strong></div>
+        <div class="meta-chip"><span>麦克风噪音</span><strong>45 ± 2 dB</strong></div> -->
+        <button class="ghost-button" id="resetButton" type="button">重置测试</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-grid">
+        <div class="hero-copy">
+          <p class="section-kicker">END-TO-END COMPLETION RATE</p>
+          <h2>把每一句唤醒，<br><em>变成可核验的结果。</em></h2>
+          <p class="hero-description">手机 B 播放语料，车机执行任务。每条语料播放前请先唤醒 Carlink，记录真实识别与执行结果。</p>
+          <div class="hero-actions">
+            <button class="primary-button" id="playAllButton" type="button"><span class="play-glyph">▶</span>播放当前音色全部</button>
+            <button class="secondary-button" id="pauseButton" type="button" disabled>暂停播放</button>
+          </div>
+          <div class="queue-console" id="queueConsole" hidden>
+            <div class="queue-console-top"><span class="queue-live-dot"></span><span id="queueStatus">等待下一句</span><strong id="queueCountdown">20s</strong></div>
+            <div class="queue-progress"><span id="queueProgress"></span></div>
+            <div class="queue-console-actions"><button class="queue-next-button" id="queueNextButton" type="button">立即播放下一句</button><button class="queue-wait-button" id="queueWaitButton" type="button">暂停等待</button></div>
+          </div>
+          <label class="wait-setting" for="waitSeconds"><span>每句默认等待</span><input id="waitSeconds" type="number" min="1" max="120" value="20"><span>秒</span></label>
+        </div>
+        <div class="score-panel">
+          <div class="score-heading"><span>当前完成率</span><span class="target-label">目标 ≥ 93%</span></div>
+          <div class="score-value" id="rateValue">—<small>%</small></div>
+          <div class="score-track"><span id="rateBar"></span><i></i></div>
+          <div class="score-foot"><span id="rateStatus">等待开始记录</span><span id="rateHint">31 条指令 × 4 音色 · 124 项测试</span></div>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="测试统计">
+        <div class="metric"><span class="metric-label">测试项</span><strong id="testedCount">124</strong><span class="metric-unit">项</span></div>
+        <div class="metric success"><span class="metric-label">成功</span><strong id="successCount">0</strong><span class="metric-unit">条</span></div>
+        <div class="metric failure"><span class="metric-label">未通过</span><strong id="failureCount">0</strong><span class="metric-unit">项</span></div>
+        <div class="metric"><span class="metric-label">未测试</span><strong id="remainingCount">0</strong><span class="metric-unit">项</span></div>
+      </section>
+
+      <section class="workspace-section">
+        <div class="section-header">
+          <div><p class="section-kicker">VOICE LIBRARY</p><h3>业务语料库</h3></div>
+          <div class="session-tools"><span id="activeVoiceLabel">当前音色：男声 1</span><button class="link-button" id="undoButton" type="button" disabled>撤销最后一次</button></div>
+        </div>
+        <div class="category-tabs" id="categoryTabs" role="tablist"></div>
+        <div class="voice-selector" id="voiceSelector" aria-label="选择音色"></div>
+        <div class="library-heading"><div><span id="categoryIcon" class="category-icon">⌖</span><div><h4 id="categoryTitle">导航</h4><p id="categoryDescription">目的地、路线与地图操作</p></div></div><button class="secondary-button small" id="playCategoryButton" type="button">播放本组</button></div>
+        <div id="commandList" class="command-list"></div>
+      </section>
+    </main>
+    <!-- <footer><span>建议保持车机麦克风处 45 ± 2 dB</span><span>本地语音资源 · 可保留录像提交认证</span></footer> -->
+  </div>
+  <script src="app-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
