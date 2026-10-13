@@ -1,5 +1,7 @@
 (function () {
 const voices = [
+  { id: 'male-1', label: '男声 1', short: 'Yunxi', edge: 'zh-CN-YunxiNeural', tone: '稳重' },
+  { id: 'male-2', label: '男声 2', short: 'Yunyang', edge: 'zh-CN-YunyangNeural', tone: '清晰' },
   { id: 'female-1', label: '女声 1', short: 'Xiaoxiao', edge: 'zh-CN-XiaoxiaoNeural', tone: '自然' },
   { id: 'female-2', label: '女声 2', short: 'Xiaoyi', edge: 'zh-CN-XiaoyiNeural', tone: '亲和' },
 ];
@@ -20,10 +22,10 @@ const commands = [
   { id: 'nav-next-page', category: 'nav', text: '翻到下一页' },
   { id: 'nav-prev-page', category: 'nav', text: '上一页' },
   { id: 'nav-address', category: 'nav', text: '导航到北京路1号' },
+  { id: 'nav-first', category: 'nav', text: '第一个' },
   { id: 'nav-fastest', category: 'nav', text: '切换到用时最短的路线' },
   { id: 'nav-no-highway', category: 'nav', text: '切换到不走高速路线' },
   { id: 'nav-station', category: 'nav', text: '导航到深圳火车站' },
-  { id: 'nav-first', category: 'nav', text: '第一个' },
   { id: 'nav-zoom', category: 'nav', text: '放大地图' },
   { id: 'nav-shortest', category: 'nav', text: '走最短路线' },
   { id: 'call-wife', category: 'call', text: '呼叫老婆' },

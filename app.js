@@ -3,7 +3,7 @@ const { audioFile: getAudioFile, calculateRate, caseKey, categories, commands, c
 const state = { category: 'nav', voice: 'female-1', records: createDefaultRecords(commands, voices), history: [], queue: [], queueIndex: -1, currentAudio: null, playingKey: null, waitRemaining: 0, waitDuration: queueDefaults.waitSeconds, waitTimer: null, waitPaused: false };
 const $ = (id) => document.getElementById(id);
 const elements = {
-  tabs: $('categoryTabs'), voices: $('voiceSelector'), list: $('commandList'), categoryIcon: $('categoryIcon'), categoryTitle: $('categoryTitle'), categoryDescription: $('categoryDescription'), activeVoice: $('activeVoiceLabel'), rate: $('rateValue'), rateBar: $('rateBar'), rateStatus: $('rateStatus'), tested: $('testedCount'), success: $('successCount'), failure: $('failureCount'), remaining: $('remainingCount'), undo: $('undoButton'), pause: $('pauseButton'), playAll: $('playAllButton'), playCategory: $('playCategoryButton'), reset: $('resetButton'), queueConsole: $('queueConsole'), queueStatus: $('queueStatus'), queueCountdown: $('queueCountdown'), queueProgress: $('queueProgress'), queueNext: $('queueNextButton'), queueWait: $('queueWaitButton'), waitSeconds: $('waitSeconds')
+  tabs: $('categoryTabs'), voices: $('voiceSelector'), list: $('commandList'), categoryIcon: $('categoryIcon'), categoryTitle: $('categoryTitle'), categoryDescription: $('categoryDescription'), activeVoice: $('activeVoiceLabel'), rate: $('rateValue'), rateBar: $('rateBar'), rateStatus: $('rateStatus'), tested: $('testedCount'), success: $('successCount'), failure: $('failureCount'), remaining: $('remainingCount'), undo: $('undoButton'), pause: $('pauseButton'), playAll: $('playAllButton'), playCategory: $('playCategoryButton'), reset: $('resetButton'), queueConsole: $('queueConsole'), queueStatus: $('queueStatus'), queueCountdown: $('queueCountdown'), queueProgress: $('queueProgress'), queueNext: $('queueNextButton'), queuePrev: $('queuePrevButton'), queueReplay: $('queueReplayButton'), queueWait: $('queueWaitButton'), waitSeconds: $('waitSeconds')
 };
 
 function resultFor(commandId) { return state.records.get(caseKey(commandId, state.voice)); }
@@ -67,6 +67,8 @@ function clearQueueWait() {
   state.waitRemaining = 0;
   state.waitPaused = false;
   elements.queueConsole.hidden = true;
+  elements.queuePrev.disabled = true;
+  elements.queueReplay.disabled = true;
 }
 
 function cancelQueue() {
@@ -77,7 +79,14 @@ function cancelQueue() {
 
 function stopAudio() {
   if (state.currentAudio) { state.currentAudio.pause(); state.currentAudio.currentTime = 0; }
-  state.currentAudio = null; state.playingKey = null; elements.pause.disabled = true; elements.pause.textContent = '暂停播放';
+  state.currentAudio = null; state.playingKey = null; state.queueIndex = -1; elements.pause.disabled = true; elements.pause.textContent = '暂停播放';
+  updateQueueActions();
+}
+
+function updateQueueActions() {
+  elements.queueNext.disabled = state.queueIndex < 0 || state.queueIndex >= state.queue.length - 1;
+  elements.queuePrev.disabled = state.queueIndex <= 0;
+  elements.queueReplay.disabled = !state.queue[state.queueIndex];
 }
 
 function playCommand(commandId, onEnded = null) {
@@ -85,7 +94,7 @@ function playCommand(commandId, onEnded = null) {
   const command = commands.find((item) => item.id === commandId);
   const voice = voices.find((item) => item.id === state.voice);
   const audio = new Audio(getAudioFile(command, voice));
-  state.currentAudio = audio; state.playingKey = `${command.id}:${voice.id}`; elements.pause.disabled = false; renderCommands();
+  state.currentAudio = audio; state.playingKey = `${command.id}:${voice.id}`; elements.pause.disabled = false; renderCommands(); updateQueueActions();
   audio.addEventListener('ended', () => { state.currentAudio = null; state.playingKey = null; elements.pause.disabled = true; renderCommands(); if (onEnded) onEnded(); });
   audio.addEventListener('error', () => { stopAudio(); renderCommands(); alert(`音频文件无法加载：${getAudioFile(command, voice)}`); });
   audio.play().catch(() => { stopAudio(); renderCommands(); });
@@ -108,12 +117,12 @@ function advanceQueue() {
   clearQueueWait();
   state.queueIndex += 1;
   if (state.queueIndex >= state.queue.length) { finishQueue(); return; }
-  playCommand(state.queue[state.queueIndex].id, beginQueueWait);
+  playCommand(state.queue[state.queueIndex].id, () => beginQueueWait(false));
 }
 
-function beginQueueWait() {
+function beginQueueWait(isReplay = false) {
   clearQueueWait();
-  if (state.queueIndex >= state.queue.length - 1) { finishQueue(); return; }
+  if (!isReplay && state.queueIndex >= state.queue.length - 1) { finishQueue(); return; }
   state.waitDuration = normalizeWaitSeconds(elements.waitSeconds.value);
   elements.waitSeconds.value = state.waitDuration;
   state.waitRemaining = state.waitDuration;
@@ -146,6 +155,20 @@ elements.playAll.addEventListener('click', () => playQueue(commands));
 elements.playCategory.addEventListener('click', () => playQueue(commands.filter((item) => item.category === state.category)));
 elements.pause.addEventListener('click', () => { if (!state.currentAudio) return; if (state.currentAudio.paused) { state.currentAudio.play(); elements.pause.textContent = '暂停播放'; } else { state.currentAudio.pause(); elements.pause.textContent = '继续播放'; } });
 elements.queueNext.addEventListener('click', () => advanceQueue());
+elements.queuePrev.addEventListener('click', () => stepQueueBack());
+elements.queueReplay.addEventListener('click', () => replayCurrent());
 elements.queueWait.addEventListener('click', () => { state.waitPaused = !state.waitPaused; elements.queueWait.textContent = state.waitPaused ? '继续等待' : '暂停等待'; updateQueueConsole(); });
+
+function replayCurrent() {
+  const item = state.queue[state.queueIndex];
+  if (!item) return;
+  playCommand(item.id, () => beginQueueWait(true));
+}
+
+function stepQueueBack() {
+  if (state.queueIndex <= 0) return;
+  state.queueIndex -= 2;
+  advanceQueue();
+}
 
 render();

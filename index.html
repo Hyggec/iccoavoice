@@ -37,7 +37,7 @@
           <div class="queue-console" id="queueConsole" hidden>
             <div class="queue-console-top"><span class="queue-live-dot"></span><span id="queueStatus">等待下一句</span><strong id="queueCountdown">20s</strong></div>
             <div class="queue-progress"><span id="queueProgress"></span></div>
-            <div class="queue-console-actions"><button class="queue-next-button" id="queueNextButton" type="button">立即播放下一句</button><button class="queue-wait-button" id="queueWaitButton" type="button">暂停等待</button></div>
+            <div class="queue-console-actions"><button class="queue-step-button" id="queuePrevButton" type="button">上一句</button><button class="queue-step-button" id="queueReplayButton" type="button">重播</button><button class="queue-next-button" id="queueNextButton" type="button">立即播放下一句</button><button class="queue-wait-button" id="queueWaitButton" type="button">暂停等待</button></div>
           </div>
           <label class="wait-setting" for="waitSeconds"><span>每句默认等待</span><input id="waitSeconds" type="number" min="1" max="120" value="20"><span>秒</span></label>
         </div>
@@ -45,12 +45,12 @@
           <div class="score-heading"><span>当前完成率</span><span class="target-label">目标 ≥ 93%</span></div>
           <div class="score-value" id="rateValue">—<small>%</small></div>
           <div class="score-track"><span id="rateBar"></span><i></i></div>
-          <div class="score-foot"><span id="rateStatus">等待开始记录</span><span id="rateHint">30 条指令 × 2 女声 · 60 项测试</span></div>
+          <div class="score-foot"><span id="rateStatus">等待开始记录</span><span id="rateHint">30 条指令 × 4 音色 · 120 项测试</span></div>
         </div>
       </section>
 
       <section class="metrics-grid" aria-label="测试统计">
-        <div class="metric"><span class="metric-label">测试项</span><strong id="testedCount">60</strong><span class="metric-unit">项</span></div>
+        <div class="metric"><span class="metric-label">测试项</span><strong id="testedCount">120</strong><span class="metric-unit">项</span></div>
         <div class="metric success"><span class="metric-label">成功</span><strong id="successCount">0</strong><span class="metric-unit">条</span></div>
         <div class="metric failure"><span class="metric-label">未通过</span><strong id="failureCount">0</strong><span class="metric-unit">项</span></div>
         <div class="metric"><span class="metric-label">未测试</span><strong id="remainingCount">0</strong><span class="metric-unit">项</span></div>
