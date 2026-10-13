@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 await import('../app-data.js');
@@ -58,4 +58,16 @@ test('每条语料在四个音色下都有可用的本地 MP3', () => {
   const missing = commands.flatMap((command) => voices.map((voice) => audioFile(command, voice)))
     .filter((relative) => !existsSync(join(audioDir, relative.replace('audio/', ''))) || statSync(join(audioDir, relative.replace('audio/', ''))).size === 0);
   assert.deepEqual(missing, []);
+});
+
+test('generate_audio.py 的音色与语料和 app-data.js 始终保持一致', () => {
+  const script = readFileSync(join(audioDir, '..', 'generate_audio.py'), 'utf8');
+  const between = (start, end) => script.slice(script.indexOf(start), script.indexOf(end));
+  const tuples = (block) => [...block.matchAll(/\("([\w-]+)",\s*"([^"]+)"\)/g)].map((m) => [m[1], m[2]]);
+
+  assert.deepEqual(tuples(between('COMMANDS: list', 'COMMAND_TEXT')), commands.map((item) => [item.id, item.text]));
+  assert.deepEqual(
+    [...between('VOICES: dict', 'COMMANDS: list').matchAll(/^\s{4}"([\w-]+)":/gm)].map((m) => m[1]),
+    voices.map((voice) => voice.id),
+  );
 });

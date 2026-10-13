@@ -79,7 +79,7 @@ function cancelQueue() {
 
 function stopAudio() {
   if (state.currentAudio) { state.currentAudio.pause(); state.currentAudio.currentTime = 0; }
-  state.currentAudio = null; state.playingKey = null; state.queueIndex = -1; elements.pause.disabled = true; elements.pause.textContent = '暂停播放';
+  state.currentAudio = null; state.playingKey = null; elements.pause.disabled = true; elements.pause.textContent = '暂停播放';
   updateQueueActions();
 }
 
@@ -129,6 +129,7 @@ function beginQueueWait(isReplay = false) {
   elements.queueConsole.hidden = false;
   elements.queueWait.textContent = '暂停等待';
   updateQueueConsole();
+  updateQueueActions();
   state.waitTimer = window.setInterval(() => {
     if (state.waitPaused) return;
     state.waitRemaining -= 1;
