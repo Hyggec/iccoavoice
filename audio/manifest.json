@@ -53,8 +53,8 @@
   "music-violin__male-2.mp3": "13b6edda9b81",
   "nav-address__female-1.mp3": "b8414cd00aab",
   "nav-address__female-2.mp3": "b8414cd00aab",
-  "nav-address__male-1.mp3": "77f64c2b96f9",
-  "nav-address__male-2.mp3": "77f64c2b96f9",
+  "nav-address__male-1.mp3": "b8414cd00aab",
+  "nav-address__male-2.mp3": "b8414cd00aab",
   "nav-close__female-1.mp3": "3b25082eac53",
   "nav-close__female-2.mp3": "3b25082eac53",
   "nav-close__male-1.mp3": "3b25082eac53",
@@ -101,8 +101,8 @@
   "nav-shortest__male-2.mp3": "befd585daf93",
   "nav-station__female-1.mp3": "be4d978d655e",
   "nav-station__female-2.mp3": "be4d978d655e",
-  "nav-station__male-1.mp3": "eb6f152a5c54",
-  "nav-station__male-2.mp3": "eb6f152a5c54",
+  "nav-station__male-1.mp3": "be4d978d655e",
+  "nav-station__male-2.mp3": "be4d978d655e",
   "nav-zoom__female-1.mp3": "2e465fe47d33",
   "nav-zoom__female-2.mp3": "2e465fe47d33",
   "nav-zoom__male-1.mp3": "2e465fe47d33",
@@ -117,6 +117,6 @@
   "other-time__male-2.mp3": "4006c136a992",
   "other-weather__female-1.mp3": "f1a224b1179d",
   "other-weather__female-2.mp3": "f1a224b1179d",
-  "other-weather__male-1.mp3": "a26575e65bac",
-  "other-weather__male-2.mp3": "a26575e65bac"
+  "other-weather__male-1.mp3": "f1a224b1179d",
+  "other-weather__male-2.mp3": "f1a224b1179d"
 }

@@ -10,6 +10,11 @@
     python generate_audio.py --only nav-address --force
     python generate_audio.py --voices male-1 male-2 --force
     python generate_audio.py --check               # 只校验，不合成
+    python generate_audio.py --proxy http://127.0.0.1:7890 --force
+
+关于网络：脚本会自动把合成请求指向微软当前使用的端点
+（`api.msedgeservices.com`），国内可直连，通常无需代理。若所在网络仍需
+代理，可用 `--proxy` 指定（也会自动读取 `HTTPS_PROXY` 环境变量）。
 
 `--check` 会报告三类问题并以非零码退出，便于接到 CI：
 
@@ -32,6 +37,30 @@ import sys
 from pathlib import Path
 
 import edge_tts
+
+
+# --- 合成端点兼容补丁 -------------------------------------------------------
+# 2026 年 10 月起，旧端点 speech.platform.bing.com 对合成用的 WebSocket 握手在
+# 多数地区直接返回 403（10 月 12 日起美国同样被拒），与令牌、版本、时钟均无关。
+# Microsoft Edge 155 已改用 api.msedgeservices.com/tts/cognitiveservices/websocket/v1，
+# 该主机同样接受这个公开 token，但要以 Ocp-Apim-Subscription-Key 查询参数传递。
+# 上游修复见 https://github.com/rany2/edge-tts/pull/491；依赖版本内置该改动后，
+# 本函数会自动跳过。语音列表接口仍走旧主机，不受影响。
+def _patch_synthesis_endpoint() -> bool:
+    from edge_tts import communicate, constants
+
+    if "msedgeservices.com" in communicate.WSS_URL:
+        return False
+    url = (
+        "wss://api.msedgeservices.com/tts/cognitiveservices/websocket/v1"
+        f"?Ocp-Apim-Subscription-Key={constants.TRUSTED_CLIENT_TOKEN}"
+    )
+    constants.WSS_URL = url
+    communicate.WSS_URL = url
+    return True
+
+
+ENDPOINT_PATCHED = _patch_synthesis_endpoint()
 
 ROOT = Path(__file__).parent
 OUT = ROOT / "audio"
@@ -97,8 +126,9 @@ def save_manifest(manifest: dict[str, str]) -> None:
     )
 
 
-async def synthesize(path: Path, voice_id: str, text: str) -> None:
+async def synthesize(path: Path, voice_id: str, text: str, proxy: str | None = None) -> None:
     config = VOICES[voice_id]
+    last: Exception | None = None
     for attempt in range(4):
         try:
             if path.exists():
@@ -109,14 +139,22 @@ async def synthesize(path: Path, voice_id: str, text: str) -> None:
                 rate=config["rate"],
                 pitch=config["pitch"],
                 volume="+0%",
+                proxy=proxy,
             ).save(str(path))
             if path.stat().st_size > 0:
                 return
-        except Exception:
+        except Exception as exc:
+            last = exc
             if attempt == 3:
-                raise
+                break
             await asyncio.sleep(1.2)
-    raise RuntimeError(f"No audio generated for {path}")
+    message = f"合成失败：{path.name}"
+    if last is not None and "403" in str(last):
+        message += (
+            "\n  微软合成端点返回 403，当前网络出口无法访问该服务。"
+            "\n  请连接海外节点后重试，或用 --proxy http://127.0.0.1:<端口> 指定海外代理。"
+        )
+    raise RuntimeError(message) from last
 
 
 def selected(command_ids: list[str] | None, voice_ids: list[str] | None) -> list[tuple[str, str, str]]:
@@ -173,7 +211,7 @@ def check() -> int:
     return 1 if (missing or stale or untracked or orphans) else 0
 
 
-async def generate(command_ids, voice_ids, force: bool) -> None:
+async def generate(command_ids, voice_ids, force: bool, proxy: str | None = None) -> None:
     OUT.mkdir(exist_ok=True)
     manifest = load_manifest()
     jobs = selected(command_ids, voice_ids)
@@ -185,7 +223,7 @@ async def generate(command_ids, voice_ids, force: bool) -> None:
             manifest.setdefault(path.name, text_hash(text))
             skipped += 1
             continue
-        await synthesize(path, voice_id, text)
+        await synthesize(path, voice_id, text, proxy)
         manifest[path.name] = text_hash(text)
         created += 1
         print(f"created {path.name}")
@@ -200,11 +238,12 @@ def main() -> None:
     parser.add_argument("--only", nargs="+", metavar="COMMAND_ID", help="只处理指定指令")
     parser.add_argument("--voices", nargs="+", metavar="VOICE_ID", help="只处理指定音色")
     parser.add_argument("--check", action="store_true", help="只校验音频是否与文案一致，不合成")
+    parser.add_argument("--proxy", metavar="URL", help="合成时使用的 HTTP 代理，如 http://127.0.0.1:7890")
     args = parser.parse_args()
 
     if args.check:
         raise SystemExit(check())
-    asyncio.run(generate(args.only, args.voices, args.force))
+    asyncio.run(generate(args.only, args.voices, args.force, args.proxy))
 
 
 if __name__ == "__main__":

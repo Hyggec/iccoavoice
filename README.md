@@ -24,7 +24,16 @@ python generate_audio.py                                  # 只补齐缺失或�
 python generate_audio.py --force --only nav-address       # 重做指定指令的全部音色
 python generate_audio.py --voices male-1 male-2 --force   # 只重做男声
 python generate_audio.py --check                          # 校验音频与文案是否一致
+python generate_audio.py --proxy http://127.0.0.1:7890 --force   # 经代理合成
 ```
+
+> **关于 403**：2026 年 10 月起，微软旧的合成端点
+> `speech.platform.bing.com` 在多数地区（10 月 12 日起含美国）对合成握手直接返回
+> 403，与令牌、版本、时钟都无关。脚本已自动把合成请求切到微软当前使用的
+> `api.msedgeservices.com`，**国内可直连，无需代理**。
+> 上游修复见 [rany2/edge-tts#491](https://github.com/rany2/edge-tts/pull/491)，
+> 依赖版本内置该改动后脚本会自动跳过这层兼容。
+> 若所在网络仍需代理，可用 `--proxy http://127.0.0.1:7890` 指定。
 
 `audio/manifest.json` 记录每个文件合成时所用文案的指纹，请随音频一起提交。
 `--check` 会据此找出**文案已变更但音频没跟着更新**的文件，并以非零码退出，可接入 CI。
