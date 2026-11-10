@@ -12,13 +12,15 @@
   ];
   const storageKey = 'carlink-wake-counts-v1';
   const audioVersion = 'fd33b2130617';
+  const clipVersions = { 'xiaobu::male-1': '1244dab08f63' };
 
   function countKey(phraseId, voiceId) {
     return phraseId + '::' + voiceId;
   }
 
   function audioFile(phrase, voice) {
-    return 'audio/wake/' + phrase.id + '__' + voice.id + '.wav?v=' + audioVersion;
+    const version = clipVersions[countKey(phrase.id, voice.id)] || audioVersion;
+    return 'audio/wake/' + phrase.id + '__' + voice.id + '.wav?v=' + version;
   }
 
   function createCounts() {

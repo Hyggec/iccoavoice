@@ -23,7 +23,7 @@
 - 计数使用独立的浏览器本地存储，刷新后保留。仅「清零唤醒计数」会清空12个组合；原「重置测试」不影响唤醒计数。
 - 唤醒不计入原30条指令、120项业务测试及完成率。浏览器禁止本地存储时仍能计数，但刷新不能恢复。
 
-素材全部重新切自提供的「小布小布 小V小V 小爱同学.mp3」，未合成或变声，小布和小V也使用这份新录音。文件位于audio/wake/，使用24 kHz单声道PCM WAV保留原录音；original.mp3保留来源，manifest.json记录来源SHA-256及12段的音色、唤醒词、原始组序和切分时间。唤醒音色编号独立于业务库，不代表业务TTS音色名称。页面脚本、样式和12个音频使用源文件指纹作为资源版本，避免更新后继续命中旧缓存；修改素材时需同步更新wake-data.js的audioVersion和index.html中的版本参数。
+除男声1的「小布小布」外，其余11段素材切自「小布小布 小V小V 小爱同学.mp3」。男声1的「小布小布」单独使用提供的「小布小布.mp3」，按文件原有语速播放，未变声或额外调速。文件位于audio/wake/，使用24 kHz单声道PCM WAV；original.mp3保留默认来源，xiaobu__male-1.original.mp3保留单段来源。manifest.json记录各段的SHA-256和切分时间，单段的source字段优先于默认source。音色编号和独立计数键保持不变。音频按对应来源指纹更新缓存版本；替换单段时同步更新wake-data.js的clipVersions和index.html中的脚本缓存参数。
 
 验证命令：node --test tests/test_app.mjs tests/test_queue.mjs tests/test_wake.mjs。
 

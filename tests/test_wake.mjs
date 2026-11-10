@@ -9,6 +9,12 @@ import vm from 'node:vm';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const script = (name) => existsSync(join(root, name)) ? readFileSync(join(root, name), 'utf8') : '';
 
+function assetVersion(phraseId, voiceId) {
+  const manifest = JSON.parse(readFileSync(join(root, 'audio/wake/manifest.json'), 'utf8'));
+  const clip = manifest.clips.find((item) => item.file === 'audio/wake/' + phraseId + '__' + voiceId + '.wav');
+  return (clip.source || manifest.source).sha256.slice(0, 12);
+}
+
 function harness({ saved = null, blockedStorage = false, business = false, rejectNextPlay = false, deferredPlay = false } = {}) {
   const elements = new Map();
   const storage = new Map(saved === null ? [] : [['carlink-wake-counts-v1', saved]]);
@@ -118,6 +124,7 @@ test('十二个唤醒文件是独立有效WAV，并记录原录音的切分信�
       assert.equal(createHash('sha256').update(clip).digest('hex'), entry.sha256);
       assert.equal(clip.readUInt32LE(40), Math.round(entry.duration * 24000) * 2);
       assert.equal(clip.length, clip.readUInt32LE(40) + 44);
+      if (entry.source) assert.equal(createHash('sha256').update(readFileSync(join(root, entry.source.file))).digest('hex'), entry.source.sha256);
     }
   }
   assert.equal(paths.size, 12);
@@ -150,7 +157,7 @@ test('四音色三语料可以分别选择，计数归属于播放时的组合',
     app.selectVoice(voice.id);
     for (const phrase of app.context.WakeData.phrases) {
       const audio = app.play(phrase.id);
-      assert.equal(audio.src, 'audio/wake/' + phrase.id + '__' + voice.id + '.wav?v=' + app.context.WakeData.audioVersion);
+      assert.equal(audio.src, 'audio/wake/' + phrase.id + '__' + voice.id + '.wav?v=' + assetVersion(phrase.id, voice.id));
       audio.emit('playing');
       audio.emit('ended');
       assert.equal(app.count(phrase.id), 1);
@@ -236,7 +243,7 @@ test('业务重置不清空唤醒，唤醒清零不改变业务失败项或队�
 test('页面使用独立唤醒控件和脚本', () => {
   const html = script('index.html');
   for (const id of ['wakeVoiceSelector', 'wakePhraseList', 'wakeTotalCount', 'wakeVoiceCount', 'wakePauseButton', 'wakeStopButton', 'wakeResetButton', 'wakeStatus', 'wakeStorageNote']) assert.ok(html.includes('id="' + id + '"'), id);
-  assert.match(html, /src="wake-data\.js\?v=[a-f0-9]{12}"/);
+  assert.match(html, /src="wake-data\.js\?v=[a-f0-9]{12}(?:&amp;clip=[a-f0-9]{12})?"/);
   assert.match(html, /src="wake\.js\?v=[a-f0-9]{12}"/);
   assert.doesNotMatch(script('wake.js'), /CarlinkData|createDefaultRecords|recordResult|cancelQueue|playQueue/);
 });
@@ -281,7 +288,7 @@ test('非法音色、非法唤醒词和无目标点击不会触发播放', () =>
   app.element('wakePhraseList').dispatch('click', { target: { closest: () => null } });
   assert.equal(app.audios.length, 0);
   const audio = app.play('xiaobu');
-  assert.equal(audio.src, 'audio/wake/xiaobu__male-1.wav?v=' + app.context.WakeData.audioVersion);
+  assert.equal(audio.src, 'audio/wake/xiaobu__male-1.wav?v=' + assetVersion('xiaobu', 'male-1'));
 });
 
 test('首次加载期间暂停能继续，主动中止不误报播放失败', async () => {
@@ -297,7 +304,7 @@ test('首次加载期间暂停能继续，主动中止不误报播放失败', as
   assert.equal(app.total(), 1);
 });
 
-test('全部12个唤醒组合使用用户的新录音，并对云端缓存更新版本', () => {
+test('12个唤醒组合按对应录音加载，并对云端缓存更新版本', () => {
   const app = harness();
   const manifest = JSON.parse(readFileSync(join(root, 'audio/wake/manifest.json'), 'utf8'));
   assert.equal(manifest.source.originalName, '小布小布 小V小V 小爱同学.mp3');
@@ -309,7 +316,7 @@ test('全部12个唤醒组合使用用户的新录音，并对云端缓存更新
   assert.ok(html.includes('styles.css?v=' + app.context.WakeData.audioVersion));
   for (const voice of app.context.WakeData.voices) {
     for (const phrase of app.context.WakeData.phrases) {
-      assert.ok(app.context.WakeData.audioFile(phrase, voice).endsWith('?v=' + app.context.WakeData.audioVersion));
+      assert.ok(app.context.WakeData.audioFile(phrase, voice).endsWith('?v=' + assetVersion(phrase.id, voice.id)));
     }
   }
 });
@@ -339,4 +346,16 @@ test('快速暂停又继续时，旧play请求的拒绝不能中断新请求', a
   assert.equal(audio.paused, false);
   audio.emit('playing');
   assert.equal(app.total(), 1);
+});
+
+test('男声1小布小布单独使用新文件，其他11段音频指纹不变', () => {
+  const manifest = JSON.parse(readFileSync(join(root, 'audio/wake/manifest.json'), 'utf8'));
+  const changed = manifest.clips.find((clip) => clip.file === 'audio/wake/xiaobu__male-1.wav');
+  assert.ok(changed.source, '男声1小布小布应记录单独来源');
+  assert.equal(changed.source.originalName, '小布小布.mp3');
+  assert.equal(changed.source.sha256, '1244dab08f63af6d249b92cbdcae09d81ea92a54fcec5963077a2880cb15de94');
+  assert.equal(changed.start, 0);
+  assert.equal(changed.end, 1.872);
+  assert.deepEqual(manifest.clips.filter((clip) => clip.file !== changed.file).map((clip) => ({ file: clip.file, sha256: clip.sha256 })), [{"file":"audio/wake/xiaobu__female-1.wav","sha256":"fe094dd10aa6a724c36ad9354eaee84d17779007e21b42cb03305621a58e008e"},{"file":"audio/wake/xiaov__female-1.wav","sha256":"bb8abaa126e1202ae1d87e0990c701714a9dd19d05c233b97c005306d2f24790"},{"file":"audio/wake/xiaoai__female-1.wav","sha256":"4e2c2d0962356a8b6efd058a9ee26c4acc09e09592b528efe4c42de0bc431b43"},{"file":"audio/wake/xiaobu__female-2.wav","sha256":"e325199ea5ecd87f37420b741c0d1a60bc4d3ac8965ebe2ae604ef5767e55eaa"},{"file":"audio/wake/xiaov__female-2.wav","sha256":"fd7628931a1ed8d27a8054eb4666e68e0019640e223970b62cd83c0cb3e29747"},{"file":"audio/wake/xiaoai__female-2.wav","sha256":"3bdf38db3e6c8c1066a90ec867dec04615cdcb819dc05b73efaa89d6f038204e"},{"file":"audio/wake/xiaov__male-1.wav","sha256":"57b73f64540afbe15be0b611223324721bad75ca3da77fe38ac3f92f0c6ad273"},{"file":"audio/wake/xiaoai__male-1.wav","sha256":"5294c1f1b41a2b3229c7acb4f3c641212907bae9e48b2796aeb0bf7f5f91db5c"},{"file":"audio/wake/xiaobu__male-2.wav","sha256":"f2be48b71ce29076cf8b0381a5102748ff15a8f39089c73584c2f32505f15aed"},{"file":"audio/wake/xiaov__male-2.wav","sha256":"923408660abcfddc8dac42f67489ec9e7f0b3f88c34dbd671d7d85bb6defc530"},{"file":"audio/wake/xiaoai__male-2.wav","sha256":"4075822af7e3c2d2b7879ba61a4f8084eb5728b27c878b0aee20177ef82a6f8a"}]);
+  assert.ok(script('index.html').includes('&amp;clip=1244dab08f63'));
 });
