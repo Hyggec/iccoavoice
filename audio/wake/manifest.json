@@ -1,0 +1,138 @@
+{
+  "source": {
+    "file": "audio/wake/original.mp3",
+    "originalName": "小布小布 小V小V 小爱同学.mp3",
+    "sha256": "fd33b2130617382e5b2aef16dcf79e7864fdcf22802d19bfbd88f7be1566bc3b",
+    "duration": 18.408,
+    "sampleRate": 24000,
+    "channels": 1
+  },
+  "format": {
+    "container": "WAV",
+    "encoding": "PCM signed 16-bit little endian",
+    "sampleRate": 24000,
+    "channels": 1
+  },
+  "clips": [
+    {
+      "file": "audio/wake/xiaobu__female-1.wav",
+      "voice": "female-1",
+      "phrase": "xiaobu",
+      "sourceGroup": 1,
+      "start": 0,
+      "end": 1.08,
+      "duration": 1.08,
+      "sha256": "fe094dd10aa6a724c36ad9354eaee84d17779007e21b42cb03305621a58e008e"
+    },
+    {
+      "file": "audio/wake/xiaov__female-1.wav",
+      "voice": "female-1",
+      "phrase": "xiaov",
+      "sourceGroup": 1,
+      "start": 1.35,
+      "end": 2.63,
+      "duration": 1.28,
+      "sha256": "bb8abaa126e1202ae1d87e0990c701714a9dd19d05c233b97c005306d2f24790"
+    },
+    {
+      "file": "audio/wake/xiaoai__female-1.wav",
+      "voice": "female-1",
+      "phrase": "xiaoai",
+      "sourceGroup": 1,
+      "start": 2.88,
+      "end": 4.19,
+      "duration": 1.31,
+      "sha256": "4e2c2d0962356a8b6efd058a9ee26c4acc09e09592b528efe4c42de0bc431b43"
+    },
+    {
+      "file": "audio/wake/xiaobu__female-2.wav",
+      "voice": "female-2",
+      "phrase": "xiaobu",
+      "sourceGroup": 2,
+      "start": 4.91,
+      "end": 6.08,
+      "duration": 1.17,
+      "sha256": "e325199ea5ecd87f37420b741c0d1a60bc4d3ac8965ebe2ae604ef5767e55eaa"
+    },
+    {
+      "file": "audio/wake/xiaov__female-2.wav",
+      "voice": "female-2",
+      "phrase": "xiaov",
+      "sourceGroup": 2,
+      "start": 6.33,
+      "end": 7.53,
+      "duration": 1.2,
+      "sha256": "fd7628931a1ed8d27a8054eb4666e68e0019640e223970b62cd83c0cb3e29747"
+    },
+    {
+      "file": "audio/wake/xiaoai__female-2.wav",
+      "voice": "female-2",
+      "phrase": "xiaoai",
+      "sourceGroup": 2,
+      "start": 7.8,
+      "end": 9.13,
+      "duration": 1.33,
+      "sha256": "3bdf38db3e6c8c1066a90ec867dec04615cdcb819dc05b73efaa89d6f038204e"
+    },
+    {
+      "file": "audio/wake/xiaobu__male-1.wav",
+      "voice": "male-1",
+      "phrase": "xiaobu",
+      "sourceGroup": 3,
+      "start": 9.87,
+      "end": 11.07,
+      "duration": 1.2,
+      "sha256": "16bbaa490bdad1c7f7d0ba9f805e94a5d4a22e3f766f11940929cac4950a8c4b"
+    },
+    {
+      "file": "audio/wake/xiaov__male-1.wav",
+      "voice": "male-1",
+      "phrase": "xiaov",
+      "sourceGroup": 3,
+      "start": 11.31,
+      "end": 12.5,
+      "duration": 1.19,
+      "sha256": "57b73f64540afbe15be0b611223324721bad75ca3da77fe38ac3f92f0c6ad273"
+    },
+    {
+      "file": "audio/wake/xiaoai__male-1.wav",
+      "voice": "male-1",
+      "phrase": "xiaoai",
+      "sourceGroup": 3,
+      "start": 12.71,
+      "end": 13.92,
+      "duration": 1.21,
+      "sha256": "5294c1f1b41a2b3229c7acb4f3c641212907bae9e48b2796aeb0bf7f5f91db5c"
+    },
+    {
+      "file": "audio/wake/xiaobu__male-2.wav",
+      "voice": "male-2",
+      "phrase": "xiaobu",
+      "sourceGroup": 4,
+      "start": 14.7,
+      "end": 15.76,
+      "duration": 1.06,
+      "sha256": "f2be48b71ce29076cf8b0381a5102748ff15a8f39089c73584c2f32505f15aed"
+    },
+    {
+      "file": "audio/wake/xiaov__male-2.wav",
+      "voice": "male-2",
+      "phrase": "xiaov",
+      "sourceGroup": 4,
+      "start": 15.91,
+      "end": 17.23,
+      "duration": 1.32,
+      "sha256": "923408660abcfddc8dac42f67489ec9e7f0b3f88c34dbd671d7d85bb6defc530"
+    },
+    {
+      "file": "audio/wake/xiaoai__male-2.wav",
+      "voice": "male-2",
+      "phrase": "xiaoai",
+      "sourceGroup": 4,
+      "start": 17.29,
+      "end": 18.35,
+      "duration": 1.06,
+      "sha256": "4075822af7e3c2d2b7879ba61a4f8084eb5728b27c878b0aee20177ef82a6f8a"
+    }
+  ]
+}

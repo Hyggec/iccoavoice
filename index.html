@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Carlink 语音端到端测试台</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=fd33b2130617">
 </head>
 <body>
   <div class="shell">
@@ -56,6 +56,30 @@
         <div class="metric"><span class="metric-label">未测试</span><strong id="remainingCount">0</strong><span class="metric-unit">项</span></div>
       </section>
 
+      <section class="wake-section" aria-labelledby="wakeTitle">
+        <div class="wake-heading">
+          <div>
+            <p class="section-kicker">WAKE WORD / INDEPENDENT COUNTER</p>
+            <h3 id="wakeTitle">语音唤醒</h3>
+            <p class="wake-description">两男两女 × 三组唤醒词 · 使用原录音 · 不计入业务完成率</p>
+          </div>
+          <div class="wake-counters" aria-live="polite" aria-atomic="true">
+            <div><span>唤醒总次数</span><strong id="wakeTotalCount">0</strong></div>
+            <div><span>当前音色次数</span><strong id="wakeVoiceCount">0</strong></div>
+          </div>
+        </div>
+        <div id="wakeVoiceSelector" class="wake-voices" role="group" aria-label="选择独立唤醒音色"></div>
+        <div id="wakePhraseList" class="wake-phrase-list"></div>
+        <div class="wake-toolbar">
+          <button class="secondary-button small" id="wakePauseButton" type="button" disabled>暂停唤醒播放</button>
+          <button class="secondary-button small" id="wakeStopButton" type="button" disabled>停止唤醒播放</button>
+          <button class="ghost-button" id="wakeResetButton" type="button" disabled>清零唤醒计数</button>
+        </div>
+        <p id="wakeStatus" class="wake-status" role="status">请选择音色和唤醒词，每次开始播放计数加1。</p>
+        <p class="wake-note">各音色、各唤醒词分别计数，刷新后保留。此处播放、暂停和清零均独立于业务测试。</p>
+        <p id="wakeStorageNote" class="wake-storage-note" role="status" hidden>浏览器无法保存唤醒计数，次数仅在本次页面有效。</p>
+      </section>
+
       <section class="workspace-section">
         <div class="section-header">
           <div><p class="section-kicker">VOICE LIBRARY</p><h3>业务语料库</h3></div>
@@ -71,5 +95,7 @@
   </div>
   <script src="app-data.js"></script>
   <script src="app.js"></script>
+  <script src="wake-data.js?v=fd33b2130617"></script>
+  <script src="wake.js?v=fd33b2130617"></script>
 </body>
 </html>
